@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>03 HN Story</title>
+</head>
+<body>
+  <h1>Hacker News</h1>
+  <hn-list></hn-list>
+  <script>
+    class List extends HTMLElement {
+      async connectedCallback() {
+        const resp = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json');
+        const stories = await resp.json();
+        stories.splice(10);
+        stories.forEach(id => {
+          const element = document.createElement('hn-story');
+          element.setAttribute('hn-id', id);
+          this.appendChild(element);
+        });
+      }
+    }
+    class Story extends HTMLElement {
+      async connectedCallback() {
+        const id = this.getAttribute('hn-id');
+        const resp = await fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`);
+        const story = await resp.json();
+        this.innerHTML = story.title;
+      }
+    }
+    customElements.define('hn-list', List);
+    customElements.define('hn-story', Story);
+  </script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>07 Extending Elements</title>
+</head>
+<body>
+  <h1>Hacker News</h1>
+  <ul is="hn-list" type="top"></ul>
+  <script>
+    class List extends HTMLUListElement {
+      static get observedAttributes() {
+        return ['type'];
+      }
+      
+      get type() {
+        return this.getAttribute('type');
+      }
+      
+      set type(val) {
+        this.setAttribute('type', val);
+      }
+      
+      async attributeChangedCallback(name, oldValue, newValue) {
+        if (name === 'type') {
+          this.innerHTML = '';
+          const resp = await fetch(`https://hacker-news.firebaseio.com/v0/${this.type}stories.json`);
+          const stories = await resp.json();
+          stories.splice(10);
+          stories.forEach(id => {
+            const element = document.createElement('li', { is: 'hn-story' });
+            element.setAttribute('hn-id', id);
+            this.appendChild(element);
+          });
+        }
+      }
+    }
+    class Story extends HTMLLIElement {
+      get hnId() {
+        return this.getAttribute('hn-id');
+      }
+      
+      set hnId(val) {
+        this.setAttribute('hn-id', val);
+      }
+      
+      async connectedCallback() {
+        const resp = await fetch(`https://hacker-news.firebaseio.com/v0/item/${this.hnId}.json`);
+        const story = await resp.json();
+        this.innerHTML = `Top story: ${story.title}`;
+      }
+    }
+    customElements.define('hn-list', List, { extends: 'ul' });
+    customElements.define('hn-story', Story, { extends: 'li' });
+  </script>
+</body>
+</html>

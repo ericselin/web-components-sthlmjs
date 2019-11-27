@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>02 connectedCallback</title>
+</head>
+<body>
+  <h1>Hacker News</h1>
+  <hn-list></hn-list>
+  <script>
+    class List extends HTMLElement {
+      async connectedCallback() {
+        const resp = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json');
+        const stories = await resp.json();
+        stories.forEach(id => {
+          const element = document.createElement('div');
+          element.innerHTML = id;
+          this.appendChild(element);
+        });
+      }
+    }
+    customElements.define('hn-list', List);
+  </script>
+</body>
+</html>

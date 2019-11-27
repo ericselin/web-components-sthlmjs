@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>10 Slots</title>
+  <style>
+    .title {
+      font-family: 'Comic Sans MS';
+    }
+  </style>
+</head>
+<body>
+  <h1 class="title">Hacker News</h1>
+  <hn-list type="top"></hn-list>
+  <script>
+    class List extends HTMLElement {
+      static get observedAttributes() {
+        return ['type'];
+      }
+      
+      get type() {
+        return this.getAttribute('type');
+      }
+      
+      set type(val) {
+        this.setAttribute('type', val);
+      }
+      
+      async attributeChangedCallback(name, oldValue, newValue) {
+        if (name === 'type') {
+          this.innerHTML = '';
+          const resp = await fetch(`https://hacker-news.firebaseio.com/v0/${this.type}stories.json`);
+          const stories = await resp.json();
+          stories.splice(10);
+          stories.forEach(id => {
+            const element = document.createElement('hn-story');
+            element.setAttribute('hn-id', id);
+            element.innerText = `${this.type} story:`;
+            this.appendChild(element);
+          });
+        }
+      }
+    }
+    class Story extends HTMLElement {
+      constructor() {
+        super();
+        const shadow = this.attachShadow({ mode: 'open' });
+        shadow.innerHTML = `
+        <style>
+          :host { display: block }
+          .title { font-weight: 600 }
+        </style>`;
+      }
+
+      get hnId() {
+        return this.getAttribute('hn-id');
+      }
+      
+      set hnId(val) {
+        this.setAttribute('hn-id', val);
+      }
+      
+      async connectedCallback() {
+        const resp = await fetch(`https://hacker-news.firebaseio.com/v0/item/${this.hnId}.json`);
+        const story = await resp.json();
+        this.shadowRoot.innerHTML += `<slot></slot> <span class="title">${story.title}</span>`;
+      }
+
+      disconnectedCallback() {
+        console.log(`Bye bye from ${this.hnId}`);
+      }
+    }
+    customElements.define('hn-list', List);
+    customElements.define('hn-story', Story);
+  </script>
+</body>
+</html>

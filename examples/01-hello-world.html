@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>01 Hello World</title>
+</head>
+<body>
+  <h1>This is a <code>hello-world</code> component:</h1>
+  <hello-world></hello-world>
+  <script>
+    class Hello extends HTMLElement {
+      connectedCallback() {
+        this.innerHTML = 'Hello World';
+      }
+    }
+    customElements.define('hello-world', Hello);
+  </script>
+</body>
+</html>
