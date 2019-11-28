@@ -44,9 +44,7 @@ Web components have been around for a long time and it’s now a mature way to c
 
 AMP, Polymer and Stencil all use web components. Svelte can compile to a web component target. And because it’s such a low overhead way to create components, it’s a great fit for design systems – e.g. Salesforce uses web components for their design elements.
 
-**So for your next prototype or personal project…**
-
-## Write vanilla HTML/JS/CSS, use native APIs and have fun experimenting!
+> So for your next prototype or personal project, write vanilla HTML/JS/CSS, use native APIs and have fun experimenting!
 
 ---
 
@@ -54,13 +52,13 @@ AMP, Polymer and Stencil all use web components. Svelte can compile to a web com
 
 ### Resources
 
-google.com/search?q=web+components
+[google.com/search?q=web+components](https://google.com/search?q=web+components)
 
-developer.mozilla.org/en-US/docs/Web/Web_Components
+[developer.mozilla.org/en-US/docs/Web/Web_Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components)
 
-developers.google.com/web/fundamentals/web-components/
+[developers.google.com/web/fundamentals/web-components/](https://developers.google.com/web/fundamentals/web-components/)
 
-webcomponents.org
+[webcomponents.org](https://www.webcomponents.org)
 
 [ericselin.dev](https://ericselin.dev)
 
