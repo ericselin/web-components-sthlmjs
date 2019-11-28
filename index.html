@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Hacker News Web Components</title>
+  <style>
+    .title {
+      font-family: 'Comic Sans MS';
+    }
+    select {
+      display: block;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="title">Hacker News</h1>
+  <select is="hn-type">
+    <option value="top">top stories</option>
+    <option value="best">best stories</option>
+    <option value="new">new stories</option>
+  </select>
+  <hn-list type="top"></hn-list>
+  <template id="hn-story">
+    <style>
+      :host { display: block }
+      .title { font-weight: 600 }
+    </style>
+    <slot></slot> <span class="title"></span> <a href="#" target="_blank">[Link]</a>
+  </template>
+  <script>
+    class List extends HTMLElement {
+      static get observedAttributes() {
+        return ['type'];
+      }
+      
+      get type() {
+        return this.getAttribute('type');
+      }
+      
+      set type(val) {
+        this.setAttribute('type', val);
+      }
+      
+      async attributeChangedCallback(name, oldValue, newValue) {
+        if (name === 'type') {
+          this.innerHTML = '';
+          const resp = await fetch(`https://hacker-news.firebaseio.com/v0/${this.type}stories.json`);
+          const stories = await resp.json();
+          stories.splice(10);
+          stories.forEach(id => {
+            const element = document.createElement('hn-story');
+            element.setAttribute('hn-id', id);
+            element.innerText = `${this.type} story:`;
+            this.appendChild(element);
+          });
+        }
+      }
+    }
+
+    class Story extends HTMLElement {
+      constructor() {
+        super();
+        const shadow = this.attachShadow({ mode: 'open' });
+        const template = document.getElementById('hn-story');
+        shadow.appendChild(template.content.cloneNode(true));
+      }
+
+      get hnId() {
+        return this.getAttribute('hn-id');
+      }
+      
+      set hnId(val) {
+        this.setAttribute('hn-id', val);
+      }
+      
+      async connectedCallback() {
+        const resp = await fetch(`https://hacker-news.firebaseio.com/v0/item/${this.hnId}.json`);
+        const story = await resp.json();
+        this.shadowRoot.querySelector('span').innerText = story.title;
+        this.shadowRoot.querySelector('a').href = story.url;
+      }
+
+      disconnectedCallback() {
+        console.log(`Bye bye from ${this.hnId}`);
+      }
+    }
+    
+    class Type extends HTMLSelectElement {
+      constructor() {
+        super();
+        this.addEventListener('change', (e) => {
+          document.querySelector('hn-list').type = this.value;
+        });
+      }
+    }
+
+    customElements.define('hn-list', List);
+    customElements.define('hn-story', Story);
+    customElements.define('hn-type', Type, { extends: 'select' });
+  </script>
+</body>
+</html>
